@@ -1,0 +1,8 @@
+* {
+	-fx-background-color: rgb(70, 70, 70);
+}
+
+.label,
+.text {
+	-fx-text-fill: rgb(215, 215, 215);
+}
