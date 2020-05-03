@@ -1,0 +1,33 @@
+* {
+	-fx-background-color: rgb(70, 70, 70);
+}
+
+.label,
+.text {
+	-fx-text-fill: rgb(215, 215, 215);
+}
+
+.streampi-button {
+	-fx-text-fill: rgb(215, 215, 215);
+	-fx-background-color: rgb(50, 50, 50);
+	-fx-background-radius: 15%;
+	-fx-border-radius: 15%;
+	-fx-border-color: black;
+}
+
+.streampi-button:hover {
+	-fx-background-color: rgb(40, 40, 40);
+	-fx-border-radius: 17%;
+	-fx-background-radius: 17%;
+}
+
+.streampi-button:pressed {
+	-fx-background-color: rgb(50, 50, 50);
+}
+
+.streampi-icon-pane {
+	-fx-background-color: rgb(30, 30, 30);
+	-fx-border-color: black;
+	-fx-background-radius: 15%;
+	-fx-border-radius: 15%;
+}

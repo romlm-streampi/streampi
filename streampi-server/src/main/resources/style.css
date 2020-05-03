@@ -1,0 +1,33 @@
+* {
+	-fx-background-color: rgb(70, 70, 70);
+}
+
+.label,
+.text {
+	-fx-text-fill: rgb(215, 215, 215);
+}
+
+.menu-bar .menu:hover,
+.menu-bar .menu:hover * {
+	-fx-background-color: rgb(30, 30, 30);
+}
+
+.titled-pane {
+	-fx-text-fill: rgb(215, 215, 215);
+}
+
+.titled-pane .title .arrow-button .arrow {
+	-fx-background-color: rgb(215, 215, 215);
+}
+
+.titled-pane .title:hover .arrow-button .arrow {
+	-fx-background-color: rgb(150, 150, 150);
+}
+
+.titled-pane .title:hover {
+	-fx-text-fill: rgb(100, 100, 100);
+}
+
+.titled-pane .content {
+	-fx-border-color: rgb(70, 70, 70);
+}
