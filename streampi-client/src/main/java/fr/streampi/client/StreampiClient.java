@@ -22,8 +22,12 @@ public class StreampiClient extends Application {
 
 			@Override
 			protected void onScriptTriggered(ScriptableIcon icon) {
-				
-
+				System.out.println("sending : " + icon.getScriptInfo());
+				try {
+					client.sendScriptInfo(icon.getScriptInfo());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 		};

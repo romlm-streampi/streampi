@@ -54,10 +54,18 @@ public class DataClient implements Closeable {
 	public void start() {
 		this.isRunning.set(true);
 		receiver = new Thread(() -> {
+			BufferedReader reader = null;
+			try {
+				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			} catch (IOException e) {
+				this.isRunning.set(false);
+				e.printStackTrace();
+			}
 			while (this.isRunning.get() && !this.socket.isClosed() && !this.dataSocket.isClosed()) {
-				try (BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+				try {
 					String message = reader.readLine();
 					if (message != null && !message.equals("")) {
+						System.out.println("message is : " + message);
 						switch (message) {
 						case "LAYOUT":
 							try {
@@ -83,7 +91,6 @@ public class DataClient implements Closeable {
 						}
 					}
 				} catch (SocketTimeoutException e) {
-					e.printStackTrace();
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -95,8 +102,8 @@ public class DataClient implements Closeable {
 
 	private void sendCommand(String command) throws IOException {
 		this.writer.write(command);
-		this.writer.newLine();
-		this.dataWriter.flush();
+		this.writer.write("\r\n");
+		this.writer.flush();
 	}
 
 	public void sendScriptInfo(ScriptInfo info) throws IOException {
@@ -110,7 +117,7 @@ public class DataClient implements Closeable {
 		if (dataReader == null)
 			dataReader = new ObjectInputStream(dataSocket.getInputStream());
 		Object res = dataReader.readObject();
-		if (res.getClass() == type)
+		if (type.isInstance(res))
 			return (T) res;
 
 		return null;
@@ -123,16 +130,20 @@ public class DataClient implements Closeable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		if (dataReader != null)
-			this.dataReader.close();
-		if (dataWriter != null)
-			this.dataWriter.close();
-		if (!dataSocket.isClosed())
+		if (dataSocket != null && !dataSocket.isClosed()) {
+			if (dataReader != null)
+				this.dataReader.close();
+			if (dataWriter != null)
+				this.dataWriter.close();
 			this.dataSocket.close();
-		if (writer != null)
-			this.writer.close();
-		if (!socket.isClosed())
+		}
+
+		if (socket != null && !socket.isClosed()) {
+			if (writer != null)
+				this.writer.close();
 			this.socket.close();
+		}
+
 	}
 
 	public ObjectProperty<Layout> getLayoutProperty() {

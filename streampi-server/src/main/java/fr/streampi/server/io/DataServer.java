@@ -9,9 +9,11 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import fr.streampi.librairy.model.Layout;
+import fr.streampi.librairy.model.ScriptInfo;
 import fr.streampi.server.io.model.Client;
 import fr.streampi.server.io.model.ClientProcessor;
 import fr.streampi.server.io.model.DataClientProcessor;
@@ -55,14 +57,7 @@ public class DataServer implements Closeable {
 					System.out.println(String.format("client %s successfully connected to data socket",
 							dataClient.getInetAddress().getHostName()));
 
-					DataClientProcessor processor = new DataClientProcessor(dataClient) {
-
-						@Override
-						protected void onObjectReceived(Object obj) {
-							System.out.println(obj);
-
-						}
-					};
+					DataClientProcessor processor = new DataClientProcessor(dataClient);
 
 					synchronized (clients) {
 						boolean clientExists = false;
@@ -84,9 +79,6 @@ public class DataServer implements Closeable {
 							this.clients.add(client);
 						}
 					}
-
-					Thread dataThread = new Thread(processor);
-					dataThread.start();
 				} catch (SocketTimeoutException e) {
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -109,7 +101,23 @@ public class DataServer implements Closeable {
 
 						@Override
 						public void onMessage(String message) {
-							System.out.println(message);
+							switch (message) {
+							case "SCRIPT":
+								Optional<Client> optClient = clients.stream()
+										.filter(c -> c.getAddress().equals(clientSocket.getInetAddress())).findFirst();
+								if (optClient.isPresent()) {
+									try {
+										ScriptInfo info = optClient.get().getDataProcessor()
+												.readObject(ScriptInfo.class);
+										System.out.println("recived script " + info);
+									} catch (ClassNotFoundException e) {
+										e.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+								}
+								break;
+							}
 						}
 
 					};
@@ -161,7 +169,6 @@ public class DataServer implements Closeable {
 	}
 
 	protected void sendLayout(Client client) throws IOException {
-		System.out.println("sended layout");
 		client.getProcessor().sendMessage("LAYOUT");
 		System.out.println(String.format("sent layout header to client %s", client.getAddress().getHostName()));
 		client.getDataProcessor().sendObject(layout);
