@@ -1,9 +1,11 @@
 package fr.streampi.client;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 
 import fr.streampi.client.io.DataClient;
+import fr.streampi.client.io.utils.DataUtils;
 import fr.streampi.librairy.model.icons.ScriptableIcon;
 import fr.streampi.librairy.view.LayoutView;
 import javafx.application.Application;
@@ -18,6 +20,7 @@ public class StreampiClient extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+
 		view = new LayoutView() {
 
 			@Override
@@ -31,6 +34,10 @@ public class StreampiClient extends Application {
 			}
 
 		};
+		File f = new File(DataUtils.iconsFolder.toURI());
+		System.out.println("icon file : " + f.toURI() + ", exists : " + f.exists());
+		System.out.println("parent file : " + DataUtils.parentFile.toURI());
+		view.setIconsFolderURI(DataUtils.iconsFolder.toURI().toString());
 		Scene scene = new Scene(view);
 
 		client.connect(InetAddress.getLoopbackAddress(), 9293, 9393);

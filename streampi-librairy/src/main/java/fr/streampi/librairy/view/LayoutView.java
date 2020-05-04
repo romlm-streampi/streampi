@@ -1,6 +1,7 @@
 package fr.streampi.librairy.view;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public abstract class LayoutView extends GridPane {
 
 	private Layout layout;
 	private ObservableList<IconPositioner<? extends Icon>> icons = FXCollections.observableArrayList();
-	private String iconsFolderURI = "";
+	private String iconsFolderURI;
 
 	public LayoutView() {
 		this(new Layout(), new String());
@@ -153,9 +154,17 @@ public abstract class LayoutView extends GridPane {
 				});
 			}
 
-			File iconFile = new File(
-					System.getProperty("user.home") + File.separator + ".streampi/icons/play-icon.png");
-			button.setGraphic(new ImageView(iconFile.toURI().toString()));
+			if (iconsFolderURI != null && positioner.getIcon().getIconName() != null) {
+				File folder = new File(URI.create(iconsFolderURI));
+				File iconFile = new File(folder, positioner.getIcon().getIconName());
+				if (iconFile.exists())
+					button.setGraphic(new ImageView(iconFile.toURI().toString()));
+				else {
+					button.setGraphic(new ImageView("/default-icon.png"));
+				}
+			} else {
+				button.setGraphic(new ImageView("/default-icon.png"));
+			}
 		}
 	}
 
@@ -168,11 +177,10 @@ public abstract class LayoutView extends GridPane {
 		folderLayout.setIcons(icons);
 		loadLayout(folderLayout);
 		backButton.setOnAction(ev -> {
-			System.out.println("parent layout requested");
 			loadLayout(parentLayout);
 		});
 
-		backButton.setText("<back icon>");
+		backButton.setGraphic(new ImageView("/parent-folder-icon.png"));
 
 	}
 
@@ -180,12 +188,12 @@ public abstract class LayoutView extends GridPane {
 		return layout.getSize();
 	}
 
-	public void setIconsFolderURI(String iconsFolderURI) {
-		this.iconsFolderURI = iconsFolderURI;
-	}
-
 	public String getIconsFolderURI() {
 		return iconsFolderURI;
+	}
+
+	public void setIconsFolderURI(String iconsFolderURI) {
+		this.iconsFolderURI = iconsFolderURI;
 	}
 
 	protected abstract void onScriptTriggered(ScriptableIcon icon);
