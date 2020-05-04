@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import fr.streampi.librairy.model.Layout;
 import fr.streampi.librairy.model.ScriptInfo;
@@ -31,6 +32,7 @@ public class DataServer implements Closeable {
 	private List<Client> clients = Collections.synchronizedList(new ArrayList<>());
 	private AtomicBoolean isRunning = new AtomicBoolean(false);
 	private Thread receiver;
+	private Consumer<ScriptInfo> onScriptReceived;
 
 	private ServerSocket server;
 	private ServerSocket dataSocket;
@@ -109,7 +111,8 @@ public class DataServer implements Closeable {
 									try {
 										ScriptInfo info = optClient.get().getDataProcessor()
 												.readObject(ScriptInfo.class);
-										System.out.println("recived script " + info);
+										if (info != null && onScriptReceived != null)
+											onScriptReceived.accept(info);
 									} catch (ClassNotFoundException e) {
 										e.printStackTrace();
 									} catch (IOException e) {
@@ -180,6 +183,14 @@ public class DataServer implements Closeable {
 			sendLayout(client);
 		}
 
+	}
+
+	public Consumer<ScriptInfo> getOnScriptReceived() {
+		return onScriptReceived;
+	}
+
+	public void setOnScriptReceived(Consumer<ScriptInfo> onScriptReceived) {
+		this.onScriptReceived = onScriptReceived;
 	}
 
 	public void close() throws IOException {

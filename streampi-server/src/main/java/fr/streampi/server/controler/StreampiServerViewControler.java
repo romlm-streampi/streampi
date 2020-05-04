@@ -5,11 +5,15 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import fr.streampi.librairy.model.IconPositioner;
 import fr.streampi.librairy.model.Layout;
 import fr.streampi.librairy.model.Positioner;
+import fr.streampi.librairy.model.Script;
 import fr.streampi.librairy.model.ScriptInfo;
 import fr.streampi.librairy.model.enums.ScriptType;
 import fr.streampi.librairy.model.icons.FolderIcon;
@@ -39,9 +43,32 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 
 	private DataServer server = new DataServer();
 
+	private Map<ScriptInfo, Script> scripts = new HashMap<>();
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+		ScriptInfo scriptInfo = new ScriptInfo("test_script", ScriptType.LAUNCHER);
+		scripts.put(scriptInfo, () -> {
+			Process p = Runtime.getRuntime().exec("cmd.exe /c start cmd");
+			System.out.println("executed command");
+		});
+
 		server = new DataServer();
+		server.setOnScriptReceived(info -> {
+			System.out.println("info : " + info);
+			System.out.println("scriptInfo : " + scriptInfo);
+			System.out.println(info.equals(scriptInfo));
+			Optional<Script> scr = Optional.ofNullable(scripts.get(info));
+			if (scr.isPresent())
+				try {
+					scr.get().execute();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			else
+				System.out.println("received script " + info);
+		});
 		layoutView = new LayoutView() {
 
 			@Override
@@ -56,8 +83,8 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 		FolderIcon icon = new FolderIcon();
 		Layout subLayout = new Layout();
 		subLayout.setSize(layoutView.getSize());
-		subLayout.getIcons().add(new IconPositioner<ScriptableIcon>(
-				new ScriptableIcon("test", new ScriptInfo("test_script", ScriptType.LAUNCHER)), new Positioner(1, 0)));
+		subLayout.getIcons()
+				.add(new IconPositioner<ScriptableIcon>(new ScriptableIcon("test", scriptInfo), new Positioner(1, 0)));
 		icon.setFolderLayout(subLayout);
 
 		layoutView.getIcons().add(new IconPositioner<FolderIcon>(icon, new Positioner(0, 0)));

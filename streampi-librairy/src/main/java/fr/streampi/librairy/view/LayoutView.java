@@ -115,8 +115,7 @@ public abstract class LayoutView extends GridPane {
 			} else {
 				pane = optChild.get();
 			}
-		} else
-			System.out.println("pane found");
+		}
 		pane.getChildren().clear();
 		Button button = new Button();
 		button.getStyleClass().add(BUTTON_CLASS);
