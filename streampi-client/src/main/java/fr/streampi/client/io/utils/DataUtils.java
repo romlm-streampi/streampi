@@ -13,8 +13,8 @@ public final class DataUtils {
 
 	public static final File parentFile = new File(
 			"/" + System.getProperty("user.home") + File.separator + ".streampi/");
-	public static final File iconsFolder = new File(parentFile, "icons/");
-	public static final File zippedIcons = new File(iconsFolder, "icons.zip");
+	public static final File iconsFolder = new File(parentFile, "icons-client/");
+	public static final File zippedIcons = new File(iconsFolder, "icons-client.zip");
 	private static final File properties = new File(parentFile, "streampi-client.properties");
 
 	private static final String DEFAULT_SERVER_ADDRESS = "localhost";
@@ -35,28 +35,32 @@ public final class DataUtils {
 		if (!properties.exists()) {
 			try {
 				properties.createNewFile();
-				props = new Properties();
-				props.load(new FileInputStream(properties));
-				boolean isChanged = false;
-				if (!props.containsKey(SERVER_ADDRESS_KEY)) {
-					isChanged = true;
-					props.put(SERVER_ADDRESS_KEY, DEFAULT_SERVER_ADDRESS);
-				}
-				if (!props.containsKey(SERVER_PORT_KEY)) {
-					isChanged = true;
-					props.put(SERVER_PORT_KEY, DEFAULT_SERVER_PORT);
-				}
-				if (!props.containsKey(SERVER_DATA_PORT_KEY)) {
-					isChanged = true;
-					props.put(SERVER_DATA_PORT_KEY, DEFAULT_SERVER_DATA_PORT);
-				}
-				if (isChanged)
-					saveProperties();
-
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		props = new Properties();
+		try {
+			props.load(new FileInputStream(properties));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		boolean isChanged = false;
+		if (!props.containsKey(SERVER_ADDRESS_KEY)) {
+			isChanged = true;
+			props.put(SERVER_ADDRESS_KEY, DEFAULT_SERVER_ADDRESS);
+		}
+		if (!props.containsKey(SERVER_PORT_KEY)) {
+			isChanged = true;
+			props.put(SERVER_PORT_KEY, String.valueOf(DEFAULT_SERVER_PORT));
+		}
+		if (!props.containsKey(SERVER_DATA_PORT_KEY)) {
+			isChanged = true;
+			props.put(SERVER_DATA_PORT_KEY, String.valueOf(DEFAULT_SERVER_DATA_PORT));
+		}
+		if (isChanged)
+			saveProperties();
+
 	}
 
 	public static Properties getProperties() {
@@ -64,10 +68,22 @@ public final class DataUtils {
 	}
 
 	public static void saveProperties() {
-		try (FileOutputStream writer = new FileOutputStream(properties);) {
-			props.store(writer, null);
+		try (FileOutputStream writer = new FileOutputStream(properties)) {
+			props.store(writer, "");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static int getDataPort() {
+		return Integer.parseInt(props.getProperty(SERVER_DATA_PORT_KEY, String.valueOf(DEFAULT_SERVER_DATA_PORT)));
+	}
+
+	public static int getPort() {
+		return Integer.parseInt(props.getProperty(SERVER_PORT_KEY, String.valueOf(DEFAULT_SERVER_PORT)));
+	}
+
+	public static String getAddress() {
+		return props.getProperty(SERVER_ADDRESS_KEY, DEFAULT_SERVER_ADDRESS);
 	}
 }

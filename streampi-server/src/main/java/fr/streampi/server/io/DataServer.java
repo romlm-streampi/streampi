@@ -1,6 +1,7 @@
 package fr.streampi.server.io;
 
 import java.io.Closeable;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -15,9 +16,11 @@ import java.util.function.Consumer;
 
 import fr.streampi.librairy.model.Layout;
 import fr.streampi.librairy.model.ScriptInfo;
+import fr.streampi.librairy.utils.ZipUtils;
 import fr.streampi.server.io.model.Client;
 import fr.streampi.server.io.model.ClientProcessor;
 import fr.streampi.server.io.model.DataClientProcessor;
+import fr.streampi.server.io.utils.DataUtils;
 
 public class DataServer implements Closeable {
 
@@ -70,8 +73,10 @@ public class DataServer implements Closeable {
 								if (client.getProcessor() != null) {
 									if (client.getProcessor().getClient().isClosed()) {
 										client.setProcessor(null);
-									} else
+									} else {
 										this.sendLayout(client);
+										this.sendIcons(client);
+									}
 									break;
 								}
 							}
@@ -133,8 +138,10 @@ public class DataServer implements Closeable {
 								if (client.getDataProcessor() != null) {
 									if (client.getDataProcessor().getClient().isClosed()) {
 										client.setProcessor(null);
-									} else
+									} else {
 										this.sendLayout(client);
+										this.sendIcons(client);
+									}
 									break;
 								}
 							}
@@ -172,17 +179,58 @@ public class DataServer implements Closeable {
 	}
 
 	protected void sendLayout(Client client) throws IOException {
-		client.getProcessor().sendMessage("LAYOUT");
-		System.out.println(String.format("sent layout header to client %s", client.getAddress().getHostName()));
-		client.getDataProcessor().sendObject(layout);
-		System.out.println(String.format("sent layout to client %s", client.getAddress().getHostName()));
+		if (isClientReady(client)) {
+			client.getProcessor().sendMessage("LAYOUT");
+			System.out.println(String.format("sent layout header to client %s", client.getAddress().getHostName()));
+			client.getDataProcessor().sendObject(layout);
+			System.out.println(String.format("sent layout to client %s", client.getAddress().getHostName()));
+		} else {
+			System.out.println(String.format("client %s is not connected to both sockets", client.getAddress()));
+		}
+
+	}
+
+	protected void sendIcons(Client client) throws IOException {
+		if (isClientReady(client)) {
+			ZipUtils.zipFolder(DataUtils.iconsFolder.toPath(), DataUtils.iconsZipFile.toPath());
+			FileInputStream reader = new FileInputStream(DataUtils.iconsZipFile);
+			byte[] b = reader.readAllBytes();
+			reader.close();
+			client.getProcessor().sendMessage("ICONS");
+			System.out.println("sent icons header to " + client.getAddress());
+			client.getDataProcessor().<byte[]>sendObject(b);
+			System.out.println("sent icons zip file to client " + client.getAddress());
+		} else {
+			System.out.println(String.format("client %s is not connected to both sockets", client.getAddress()));
+		}
+	}
+
+	public void sendIcons() throws IOException {
+		synchronized (clients) {
+			for (Client client : clients)
+				sendIcons(client);
+		}
 	}
 
 	public void updateLayout() throws IOException {
-		for (Client client : this.clients) {
-			sendLayout(client);
+		synchronized (clients) {
+			for (Client client : this.clients) {
+				sendLayout(client);
+			}
 		}
 
+	}
+
+	private boolean isClientReady(Client client) {
+		try {
+			if (client.getDataProcessor() == null || client.getDataProcessor().getClient().isClosed())
+				return false;
+			if (client.getProcessor() == null || client.getProcessor().getClient().isClosed())
+				return false;
+		} catch (NullPointerException e) {
+			return false;
+		}
+		return true;
 	}
 
 	public Consumer<ScriptInfo> getOnScriptReceived() {

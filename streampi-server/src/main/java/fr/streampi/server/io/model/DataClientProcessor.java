@@ -36,7 +36,7 @@ public class DataClientProcessor {
 	}
 
 	public <T> void sendObject(T obj) throws IOException {
-		System.out.println(String.format("sending %s to client %s", obj, client.getInetAddress().getHostName()));
+		System.out.println(String.format("sending %s to client %s", obj.getClass().getName(), client.getInetAddress().getHostName()));
 		if (this.writer == null)
 			this.writer = new ObjectOutputStream(client.getOutputStream());
 		this.writer.writeObject(obj);

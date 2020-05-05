@@ -1,4 +1,4 @@
-package fr.streampi.server.utils;
+package fr.streampi.server.io.utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,7 +18,7 @@ public final class DataUtils {
 	public static final File parentFile = new File(System.getProperty("user.home") + "/.streampi/");
 	public static final File layoutFile = new File(parentFile, ".layout");
 	public static final File iconsFolder = new File(parentFile, "icons");
-	public static final File iconsZipFile = new File(parentFile, "iconsFolder.zip");
+	public static final File iconsZipFile = new File(iconsFolder, "zippedIcons.zip");
 	public static final File propertiesFile = new File(parentFile, "streampi-server.properties");
 
 	static {

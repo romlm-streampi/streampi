@@ -1,6 +1,5 @@
 package fr.streampi.client;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -34,13 +33,12 @@ public class StreampiClient extends Application {
 			}
 
 		};
-		File f = new File(DataUtils.iconsFolder.toURI());
-		System.out.println("icon file : " + f.toURI() + ", exists : " + f.exists());
-		System.out.println("parent file : " + DataUtils.parentFile.toURI());
+
 		view.setIconsFolderURI(DataUtils.iconsFolder.toURI().toString());
 		Scene scene = new Scene(view);
 
-		client.connect(InetAddress.getLoopbackAddress(), 9293, 9393);
+		client.connect(InetAddress.getByName(DataUtils.getAddress()), DataUtils.getPort(), DataUtils.getDataPort());
+
 		client.getLayoutProperty().addListener((change, oldValue, newValue) -> {
 			Platform.runLater(() -> {
 				view.setLayout(newValue);

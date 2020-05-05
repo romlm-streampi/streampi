@@ -145,7 +145,6 @@ public abstract class LayoutView extends GridPane {
 				FolderIcon icon = (FolderIcon) positioner.getIcon();
 				button.setOnAction(ev -> {
 					this.loadFolderLayout(layout, icon.getFolderLayout());
-					System.out.println("sub folder loaded");
 				});
 			} else if (positioner.getIcon().getIconType().equals(IconType.ScriptableIcon)) {
 				ScriptableIcon icon = (ScriptableIcon) positioner.getIcon();

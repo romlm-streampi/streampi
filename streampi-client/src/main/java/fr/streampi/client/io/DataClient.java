@@ -3,6 +3,7 @@ package fr.streampi.client.io;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.Closeable;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
@@ -13,8 +14,10 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import fr.streampi.client.io.utils.DataUtils;
 import fr.streampi.librairy.model.Layout;
 import fr.streampi.librairy.model.ScriptInfo;
+import fr.streampi.librairy.utils.ZipUtils;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -65,7 +68,6 @@ public class DataClient implements Closeable {
 				try {
 					String message = reader.readLine();
 					if (message != null && !message.equals("")) {
-						System.out.println("message is : " + message);
 						switch (message) {
 						case "LAYOUT":
 							try {
@@ -82,8 +84,19 @@ public class DataClient implements Closeable {
 							break;
 
 						case "ICONS":
-							// TODO save icons to the right file
-							System.out.println("should save icons");
+							try {
+								byte[] b = readObject(byte[].class);
+
+								FileOutputStream writer = new FileOutputStream(DataUtils.zippedIcons);
+								writer.write(b);
+								writer.close();
+								ZipUtils.unzipFile(DataUtils.zippedIcons.toPath(), DataUtils.iconsFolder.toPath());
+								System.out.println("stored icons");
+							} catch (SocketTimeoutException e) {
+								System.err.println("no icons received");
+							} catch (ClassNotFoundException e) {
+								e.printStackTrace();
+							}
 							break;
 						default:
 							System.out.println("message received : " + message);

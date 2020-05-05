@@ -5,4 +5,5 @@ module fr.streampi.librairy {
 	exports fr.streampi.librairy.view;
 	exports fr.streampi.librairy.model.icons;
 	exports fr.streampi.librairy.model.enums;
+	exports fr.streampi.librairy.utils;
 }

@@ -21,6 +21,7 @@ import fr.streampi.librairy.model.icons.ScriptableIcon;
 import fr.streampi.librairy.view.LayoutView;
 import fr.streampi.server.StreampiServer;
 import fr.streampi.server.io.DataServer;
+import fr.streampi.server.io.utils.DataUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
@@ -50,15 +51,11 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 
 		ScriptInfo scriptInfo = new ScriptInfo("test_script", ScriptType.LAUNCHER);
 		scripts.put(scriptInfo, () -> {
-			Process p = Runtime.getRuntime().exec("cmd.exe /c start cmd");
-			System.out.println("executed command");
+			Runtime.getRuntime().exec("cmd.exe /c start cmd");
 		});
 
 		server = new DataServer();
 		server.setOnScriptReceived(info -> {
-			System.out.println("info : " + info);
-			System.out.println("scriptInfo : " + scriptInfo);
-			System.out.println(info.equals(scriptInfo));
 			Optional<Script> scr = Optional.ofNullable(scripts.get(info));
 			if (scr.isPresent())
 				try {
@@ -66,8 +63,6 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			else
-				System.out.println("received script " + info);
 		});
 		layoutView = new LayoutView() {
 
@@ -78,13 +73,14 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 			}
 
 		};
+		layoutView.setIconsFolderURI(DataUtils.iconsFolder.toURI().toString());
 		streampiViewer.setCenter(layoutView);
 
 		FolderIcon icon = new FolderIcon();
 		Layout subLayout = new Layout();
 		subLayout.setSize(layoutView.getSize());
-		subLayout.getIcons()
-				.add(new IconPositioner<ScriptableIcon>(new ScriptableIcon("test", scriptInfo), new Positioner(1, 0)));
+		subLayout.getIcons().add(new IconPositioner<ScriptableIcon>(new ScriptableIcon("play-icon.png", scriptInfo),
+				new Positioner(1, 0)));
 		icon.setFolderLayout(subLayout);
 
 		layoutView.getIcons().add(new IconPositioner<FolderIcon>(icon, new Positioner(0, 0)));
