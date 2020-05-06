@@ -88,7 +88,7 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 
 		server.setLayout(layoutView.getCloneLayout());
 		try {
-			server.bind(InetAddress.getByName(DataServer.DEFAULT_ADDRESS), DataServer.DEFAULT_PORT,
+			server.bind(InetAddress.getByName("192.168.1.37"), DataServer.DEFAULT_PORT,
 					DataServer.DEFAULT_DATA_PORT);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();

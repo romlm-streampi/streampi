@@ -48,8 +48,6 @@ public class DataClient implements Closeable {
 		writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
 		dataWriter = new ObjectOutputStream(dataSocket.getOutputStream());
-		// cannot initialize dataReader : blocking
-		// TODO : fix the bug
 		start();
 
 	}
@@ -72,9 +70,10 @@ public class DataClient implements Closeable {
 						case "LAYOUT":
 							try {
 								Layout layout = readObject(Layout.class);
-								System.out.println(layout);
-								if (layout != null)
+								if (layout != null) {
 									this.layoutProperty.set(layout);
+									System.out.println("layout received");
+								}
 
 							} catch (SocketTimeoutException e) {
 								System.err.println("no layout received");

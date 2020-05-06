@@ -10,10 +10,17 @@ import fr.streampi.librairy.view.LayoutView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 
 public class StreampiClient extends Application {
 
+	private BorderPane root;
 	private LayoutView view;
 	private DataClient client = new DataClient();
 
@@ -24,18 +31,29 @@ public class StreampiClient extends Application {
 
 			@Override
 			protected void onScriptTriggered(ScriptableIcon icon) {
-				System.out.println("sending : " + icon.getScriptInfo());
 				try {
 					client.sendScriptInfo(icon.getScriptInfo());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-
 		};
+		root = new BorderPane(view);
+		primaryStage.initStyle(StageStyle.UNDECORATED);
+		AnchorPane buttonBar = new AnchorPane();
+		Button exitButton = new Button();
+		AnchorPane.setRightAnchor(exitButton, 0d);
+		buttonBar.setPrefHeight(0);
+		exitButton.setGraphic(new ImageView("/close-icon.png"));
+		buttonBar.getChildren().add(exitButton);
+		root.setTop(buttonBar);
+
+		exitButton.setOnAction(action -> {
+			primaryStage.fireEvent(new WindowEvent(primaryStage, WindowEvent.WINDOW_CLOSE_REQUEST));
+		});
 
 		view.setIconsFolderURI(DataUtils.iconsFolder.toURI().toString());
-		Scene scene = new Scene(view);
+		Scene scene = new Scene(root);
 
 		client.connect(InetAddress.getByName(DataUtils.getAddress()), DataUtils.getPort(), DataUtils.getDataPort());
 

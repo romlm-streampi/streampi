@@ -125,6 +125,10 @@ public class DataServer implements Closeable {
 									}
 								}
 								break;
+								
+								default:
+									System.out.println(String.format("received %s from client %s", message, clientSocket.getInetAddress().getHostName()));
+									break;
 							}
 						}
 
