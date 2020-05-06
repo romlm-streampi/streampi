@@ -11,6 +11,7 @@ import fr.streampi.librairy.view.LayoutView;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.Cursor;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -28,6 +29,9 @@ public class StreampiClient extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
+
+		boolean isTouchScreen = this.getParameters().getRaw().stream()
+				.anyMatch(s -> s.equals("--no-cursor") || s.equals("-t"));
 
 		view = new LayoutView() {
 
@@ -85,6 +89,9 @@ public class StreampiClient extends Application {
 		});
 
 		scene.getStylesheets().add("/style.css");
+
+		if (isTouchScreen)
+			scene.setCursor(Cursor.NONE);
 
 		primaryStage.setResizable(false);
 		primaryStage.setAlwaysOnTop(true);
