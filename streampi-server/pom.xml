@@ -24,12 +24,10 @@
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-controls</artifactId>
-			<version>${javafx.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.openjfx</groupId>
 			<artifactId>javafx-fxml</artifactId>
-			<version>${javafx.version}</version>
 		</dependency>
 	</dependencies>
 	<build>
@@ -46,6 +44,8 @@
 				<artifactId>javafx-maven-plugin</artifactId>
 				<configuration>
 					<mainClass>fr.streampi.server.StreampiServer</mainClass>
+					<launcher>launcher</launcher>
+					<jlinkImageName>streampi-server</jlinkImageName>
 				</configuration>
 			</plugin>
 		</plugins>
