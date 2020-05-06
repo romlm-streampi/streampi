@@ -2,6 +2,7 @@ package fr.streampi.client;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
 
 import fr.streampi.client.io.DataClient;
 import fr.streampi.client.io.utils.DataUtils;
@@ -44,7 +45,13 @@ public class StreampiClient extends Application {
 		Button exitButton = new Button();
 		AnchorPane.setRightAnchor(exitButton, 0d);
 		buttonBar.setPrefHeight(0);
-		exitButton.setGraphic(new ImageView("/close-icon.png"));
+
+		URL url = StreampiClient.class.getClassLoader().getResource("close-icon.png");
+		if(url != null)
+			exitButton.setGraphic(new ImageView(url.toString()));
+		else
+			exitButton.setText("close");
+
 		buttonBar.getChildren().add(exitButton);
 		root.setTop(buttonBar);
 
