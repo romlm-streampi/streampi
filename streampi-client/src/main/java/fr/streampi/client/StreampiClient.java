@@ -10,6 +10,7 @@ import fr.streampi.librairy.model.icons.ScriptableIcon;
 import fr.streampi.librairy.view.LayoutView;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
@@ -39,6 +40,8 @@ public class StreampiClient extends Application {
 				}
 			}
 		};
+		Insets padding = view.getInsets();
+		view.setPadding(new Insets(0, padding.getRight(), padding.getBottom(), padding.getLeft()));
 		root = new BorderPane(view);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		AnchorPane buttonBar = new AnchorPane();
@@ -47,10 +50,11 @@ public class StreampiClient extends Application {
 		buttonBar.setPrefHeight(0);
 
 		URL url = StreampiClient.class.getClassLoader().getResource("close-icon.png");
-		if(url != null)
+		if (url != null)
 			exitButton.setGraphic(new ImageView(url.toString()));
 		else
 			exitButton.setText("close");
+		exitButton.getStyleClass().add("streampi-close-button");
 
 		buttonBar.getChildren().add(exitButton);
 		root.setTop(buttonBar);

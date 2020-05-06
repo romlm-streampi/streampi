@@ -85,12 +85,14 @@ public class DataClient implements Closeable {
 						case "ICONS":
 							try {
 								byte[] b = readObject(byte[].class);
+								if (b != null) {
+									FileOutputStream writer = new FileOutputStream(DataUtils.zippedIcons);
+									writer.write(b);
+									writer.close();
+									ZipUtils.unzipFile(DataUtils.zippedIcons.toPath(), DataUtils.iconsFolder.toPath());
+									System.out.println("stored icons");
+								}
 
-								FileOutputStream writer = new FileOutputStream(DataUtils.zippedIcons);
-								writer.write(b);
-								writer.close();
-								ZipUtils.unzipFile(DataUtils.zippedIcons.toPath(), DataUtils.iconsFolder.toPath());
-								System.out.println("stored icons");
 							} catch (SocketTimeoutException e) {
 								System.err.println("no icons received");
 							} catch (ClassNotFoundException e) {

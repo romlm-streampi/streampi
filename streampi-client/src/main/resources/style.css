@@ -7,6 +7,14 @@
 	-fx-text-fill: rgb(215, 215, 215);
 }
 
+.streampi-close-button:hover {
+	-fx-background-color: red;
+}
+
+.streampi-close-button:pressed {
+	-fx-background-color: rgb(200, 0, 0);
+}
+
 .streampi-button {
 	-fx-text-fill: rgb(215, 215, 215);
 	-fx-background-color: rgb(50, 50, 50);
