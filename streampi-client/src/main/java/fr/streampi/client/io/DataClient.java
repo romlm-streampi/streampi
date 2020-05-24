@@ -138,6 +138,7 @@ public class DataClient implements Closeable {
 	}
 
 	public void close() throws IOException {
+		this.sendCommand("EXIT");
 		this.isRunning.set(false);
 		try {
 			receiver.join();
