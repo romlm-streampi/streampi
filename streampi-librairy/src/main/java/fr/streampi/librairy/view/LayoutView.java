@@ -18,7 +18,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -46,7 +45,6 @@ public abstract class LayoutView extends GridPane {
 
 		this.setHgap(40);
 		this.setVgap(40);
-		this.setPadding(new Insets(40, 20, 0, 20));
 	}
 
 	protected void reload() {
@@ -95,7 +93,7 @@ public abstract class LayoutView extends GridPane {
 	 * @return a clone of this layout
 	 */
 	public Layout getCloneLayout() {
-		Layout layout = new Layout(this.layout.getSize(), new ArrayList<>(this.icons));
+		final Layout layout = new Layout(this.layout.getSize(), new ArrayList<>(this.icons));
 		return layout;
 	}
 

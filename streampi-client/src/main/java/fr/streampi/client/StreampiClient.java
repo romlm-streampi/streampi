@@ -80,13 +80,6 @@ public class StreampiClient extends Application {
 
 		primaryStage.setMinWidth(0);
 		primaryStage.setMinHeight(0);
-		primaryStage.widthProperty().addListener((change, oldValue, newValue) -> {
-			view.setPrefWidth(newValue.doubleValue());
-		});
-
-		primaryStage.heightProperty().addListener((change, oldValue, newValue) -> {
-			view.setPrefHeight(newValue.doubleValue());
-		});
 
 		scene.getStylesheets().add("/style.css");
 
@@ -98,6 +91,7 @@ public class StreampiClient extends Application {
 
 		primaryStage.setFullScreen(true);
 		primaryStage.setScene(scene);
+		primaryStage.initStyle(StageStyle.UTILITY);
 
 		primaryStage.setOnCloseRequest(ev -> {
 			try {
