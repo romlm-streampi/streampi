@@ -125,10 +125,27 @@ public class DataServer implements Closeable {
 									}
 								}
 								break;
-								
-								default:
-									System.out.println(String.format("received %s from client %s", message, clientSocket.getInetAddress().getHostName()));
-									break;
+							case "EXIT":
+								optClient = clients.stream()
+										.filter(c -> c.getAddress().equals(clientSocket.getInetAddress())).findFirst();
+								if (optClient.isPresent()) {
+									try {
+										optClient.get().getDataProcessor().close();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									try {
+										optClient.get().getProcessor().close();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+									clients.remove(optClient.get());
+								}
+								break;
+							default:
+								System.out.println(String.format("received %s from client %s", message,
+										clientSocket.getInetAddress().getHostName()));
+								break;
 							}
 						}
 
