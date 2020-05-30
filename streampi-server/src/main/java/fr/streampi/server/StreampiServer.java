@@ -16,7 +16,7 @@ public class StreampiServer extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-
+		
 		this.mainStage = primaryStage;
 		primaryStage.setTitle("streampi-server");
 		primaryStage.getIcons().add(new Image("/streampi-icon.png"));
@@ -25,11 +25,13 @@ public class StreampiServer extends Application {
 		this.mainStage.show();
 
 		this.mainStage.setOnCloseRequest(ev -> {
+			this.mainStage.hide();
 			try {
 				controler.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+
 		});
 
 	}

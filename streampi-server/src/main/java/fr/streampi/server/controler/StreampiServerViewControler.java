@@ -1,14 +1,19 @@
 package fr.streampi.server.controler;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import fr.streampi.librairy.model.IconPositioner;
 import fr.streampi.librairy.model.Layout;
@@ -22,8 +27,13 @@ import fr.streampi.librairy.view.LayoutView;
 import fr.streampi.server.StreampiServer;
 import fr.streampi.server.io.DataServer;
 import fr.streampi.server.io.utils.DataUtils;
+import fr.streampi.server.plugin.model.StreampiPluginModule;
+import fr.streampi.server.plugin.model.StreampiPluginObject;
+import fr.streampi.server.plugin.model.StreampiPluginRegisterer;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Insets;
+import javafx.scene.control.Accordion;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
@@ -39,6 +49,8 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 	private BorderPane streampiViewer;
 	@FXML
 	private AnchorPane buttonViewer;
+	@FXML
+	private Accordion actionSelector;
 
 	private LayoutView layoutView;
 
@@ -48,13 +60,18 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		File root = new File(System.getProperty("user.home") + "/.streampi/plugins/");
 
-		ScriptInfo scriptInfo = new ScriptInfo("test_script", ScriptType.LAUNCHER);
+		StreampiPluginRegisterer pr = new StreampiPluginRegisterer(root);
+
+		pr.getModules().stream().map(StreampiPluginModule::getObjects).collect(listCollector()).stream()
+				.map(StreampiPluginObject::getFunctions).collect(listCollector()).forEach(x -> System.out.println(x.getName()));
+
+		ScriptInfo scriptInfo = new ScriptInfo("deezer_mute", ScriptType.MODIFIER);
 		scripts.put(scriptInfo, () -> {
-			Runtime.getRuntime().exec("cmd.exe /c start cmd");
+			System.out.println("deezer muted");
 		});
 
-		server = new DataServer();
 		server.setOnScriptReceived(info -> {
 			Optional<Script> scr = Optional.ofNullable(scripts.get(info));
 			if (scr.isPresent())
@@ -64,6 +81,15 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 					e.printStackTrace();
 				}
 		});
+
+		try {
+			server.bind(InetAddress.getByName("192.168.1.37"), DataServer.DEFAULT_PORT, DataServer.DEFAULT_DATA_PORT);
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		layoutView = new LayoutView() {
 
 			@Override
@@ -75,6 +101,10 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 		};
 		layoutView.setIconsFolderURI(DataUtils.iconsFolder.toURI().toString());
 		streampiViewer.setCenter(layoutView);
+		layoutView.setPadding(new Insets(20, 20, 20, 40));
+		layoutView.setHgap(40);
+		layoutView.setVgap(40);
+		layoutView.setPrefWidth(900);
 
 		FolderIcon icon = new FolderIcon();
 		Layout subLayout = new Layout();
@@ -86,16 +116,20 @@ public class StreampiServerViewControler implements Initializable, Closeable {
 		layoutView.getIcons().add(new IconPositioner<FolderIcon>(icon, new Positioner(0, 0)));
 		layoutView.getIcons().add(new IconPositioner<ScriptableIcon>(new ScriptableIcon(), new Positioner(1, 0)));
 
-		server.setLayout(layoutView.getCloneLayout());
-		try {
-			server.bind(InetAddress.getByName("192.168.1.37"), DataServer.DEFAULT_PORT,
-					DataServer.DEFAULT_DATA_PORT);
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		updateLayout();
 
+	}
+
+	private <T> Collector<List<T>, ?, List<T>> listCollector() {
+		return Collector.of((Supplier<List<T>>) ArrayList::new, List::addAll, (left, right) -> {
+			left.addAll(right);
+			return left;
+		});
+	}
+
+	@FXML
+	public void updateLayout() {
+		server.setLayout(layoutView.getCloneLayout());
 	}
 
 	@Override
