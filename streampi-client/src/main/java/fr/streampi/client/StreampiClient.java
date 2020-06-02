@@ -6,7 +6,6 @@ import java.net.URL;
 
 import fr.streampi.client.io.DataClient;
 import fr.streampi.client.io.utils.DataUtils;
-import fr.streampi.librairy.model.icons.ScriptableIcon;
 import fr.streampi.librairy.view.LayoutView;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -33,19 +32,18 @@ public class StreampiClient extends Application {
 		boolean isTouchScreen = this.getParameters().getRaw().stream()
 				.anyMatch(s -> s.equals("--no-cursor") || s.equals("-t"));
 
-		view = new LayoutView() {
-
-			@Override
-			protected void onScriptTriggered(ScriptableIcon icon) {
-				try {
-					client.sendScriptInfo(icon.getScriptInfo());
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+		view = new LayoutView();
+		view.setOnScriptTriggered(icon -> {
+			System.out.println("icon clicked : " + icon.getIconName());
+			try {
+				client.sendScriptInfo(icon.getScriptInfo());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
-		};
-		Insets padding = view.getInsets();
-		view.setPadding(new Insets(0, padding.getRight(), padding.getBottom(), padding.getLeft()));
+		});
+		view.setPadding(new Insets(20));
+		view.setHgap(40);
+		view.setVgap(40);
 		root = new BorderPane(view);
 		primaryStage.initStyle(StageStyle.UNDECORATED);
 		AnchorPane buttonBar = new AnchorPane();
