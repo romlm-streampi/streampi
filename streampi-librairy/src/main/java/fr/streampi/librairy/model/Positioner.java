@@ -51,5 +51,14 @@ public class Positioner implements Serializable {
 	public String toString() {
 		return String.format("{colIndex: %d, rowIndex: %d}", columnIndex, rowIndex);
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Positioner)) {
+			return false;
+		} else {
+			return ((Positioner)obj).columnIndex == columnIndex && ((Positioner)obj).rowIndex == rowIndex;
+		}
+	}
 
 }

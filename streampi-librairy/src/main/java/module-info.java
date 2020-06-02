@@ -1,5 +1,5 @@
 module fr.streampi.librairy {
-	requires javafx.controls;
+	requires transitive javafx.controls;
 
 	exports fr.streampi.librairy.model;
 	exports fr.streampi.librairy.view;

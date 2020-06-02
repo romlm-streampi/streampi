@@ -3,7 +3,7 @@ package fr.streampi.librairy.model;
 import java.io.Serializable;
 import java.util.Objects;
 
-import fr.streampi.librairy.model.enums.ScriptType;
+import fr.streampi.librairy.model.enums.StreampiPluginCategory;
 
 public class ScriptInfo implements Serializable {
 
@@ -13,13 +13,13 @@ public class ScriptInfo implements Serializable {
 	private static final long serialVersionUID = 1167219143079000916L;
 
 	private String id;
-	private ScriptType type = ScriptType.DEFAULT;
+	private StreampiPluginCategory type = StreampiPluginCategory.DEFAULT;
 
 	public ScriptInfo() {
 		super();
 	}
 
-	public ScriptInfo(String name, ScriptType type) {
+	public ScriptInfo(String name, StreampiPluginCategory type) {
 		super();
 		this.id = name;
 		this.type = type;
@@ -42,14 +42,14 @@ public class ScriptInfo implements Serializable {
 	/**
 	 * @return the type
 	 */
-	public final ScriptType getType() {
+	public final StreampiPluginCategory getType() {
 		return type;
 	}
 
 	/**
 	 * @param type the type to set
 	 */
-	public final void setType(ScriptType type) {
+	public final void setType(StreampiPluginCategory type) {
 		this.type = type;
 	}
 

@@ -9,15 +9,19 @@ import java.util.stream.Collectors;
 
 import fr.streampi.librairy.model.IconPositioner;
 import fr.streampi.librairy.model.Layout;
+import fr.streampi.librairy.model.Positioner;
 import fr.streampi.librairy.model.Size;
 import fr.streampi.librairy.model.enums.IconType;
 import fr.streampi.librairy.model.icons.FolderIcon;
 import fr.streampi.librairy.model.icons.Icon;
 import fr.streampi.librairy.model.icons.ScriptableIcon;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -25,14 +29,16 @@ import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 
-public abstract class LayoutView extends GridPane {
+public class LayoutView extends GridPane {
 
 	private static final String BUTTON_CLASS = "streampi-button";
 	private static final String ICON_PANE_CLASS = "streampi-icon-pane";
 
 	private Layout layout;
 	private ObservableList<IconPositioner<? extends Icon>> icons = FXCollections.observableArrayList();
+	private ObservableMap<Positioner, Button> buttons = FXCollections.observableHashMap();
 	private String iconsFolderURI;
+	private ObjectProperty<Button> buttonSelected = new SimpleObjectProperty<>();
 
 	public LayoutView() {
 		this(new Layout(), new String());
@@ -42,9 +48,6 @@ public abstract class LayoutView extends GridPane {
 		super();
 		this.getStylesheets().add("/style.css");
 		this.setLayout(layout);
-
-		this.setHgap(40);
-		this.setVgap(40);
 	}
 
 	protected void reload() {
@@ -67,6 +70,10 @@ public abstract class LayoutView extends GridPane {
 		}
 	}
 
+	public ObservableMap<Positioner, Button> getUnmodifiableButtons() {
+		return FXCollections.unmodifiableObservableMap(buttons);
+	}
+
 	public ObservableList<IconPositioner<? extends Icon>> getIcons() {
 		return icons;
 	}
@@ -85,6 +92,10 @@ public abstract class LayoutView extends GridPane {
 		this.reloadIcons();
 
 	}
+	
+	public ObjectProperty<Button> onButtonSelectedProperty() {
+		return buttonSelected;
+	}
 
 	/**
 	 * this method should not be used to modify Layout instead use
@@ -98,6 +109,7 @@ public abstract class LayoutView extends GridPane {
 	}
 
 	protected void reloadIcons() {
+		System.out.println("reloaded icons");
 		loadLayout(this.layout);
 	}
 
@@ -117,6 +129,7 @@ public abstract class LayoutView extends GridPane {
 		}
 		pane.getChildren().clear();
 		Button button = new Button();
+		this.buttons.put(new Positioner(columnIndex, rowIndex), button);
 		button.getStyleClass().add(BUTTON_CLASS);
 		pane.getChildren().add(button);
 
@@ -147,6 +160,7 @@ public abstract class LayoutView extends GridPane {
 			} else if (positioner.getIcon().getIconType().equals(IconType.ScriptableIcon)) {
 				ScriptableIcon icon = (ScriptableIcon) positioner.getIcon();
 				button.setOnAction(event -> {
+					this.buttonSelected.set(button);
 					this.onScriptTriggered(icon);
 				});
 			}
@@ -167,7 +181,7 @@ public abstract class LayoutView extends GridPane {
 
 	protected void loadFolderLayout(Layout parentLayout, Layout folderLayout) {
 		List<IconPositioner<? extends Icon>> icons = folderLayout.getIcons().stream()
-				.filter(pos -> pos.getPositioner().getColumnIndex() != 0 || pos.getPositioner().getRowIndex() != 0)
+				.filter(pos -> !(pos.getPositioner().getColumnIndex() == 0 && pos.getPositioner().getRowIndex() == 0))
 				.collect(Collectors.toList());
 
 		Button backButton = loadIcon(new Icon(), 0, 0);
@@ -193,6 +207,8 @@ public abstract class LayoutView extends GridPane {
 		this.iconsFolderURI = iconsFolderURI;
 	}
 
-	protected abstract void onScriptTriggered(ScriptableIcon icon);
+	protected void onScriptTriggered(ScriptableIcon icon) {
+
+	}
 
 }
