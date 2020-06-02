@@ -39,7 +39,7 @@ public class IconPositioner<T extends Icon> implements Serializable {
 	/**
 	 * @return the icon
 	 */
-	public final Icon getIcon() {
+	public final T getIcon() {
 		return icon;
 	}
 
