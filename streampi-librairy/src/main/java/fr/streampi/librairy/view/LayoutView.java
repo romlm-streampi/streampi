@@ -34,17 +34,17 @@ public class LayoutView extends GridPane {
 
 	private static final String BUTTON_CLASS = "streampi-button";
 	private static final String ICON_PANE_CLASS = "streampi-icon-pane";
-	
+
 	private static final String DEFAULT_CSS_URL = "/style.css";
 	private static final String DEFAULT_ICON_URL = "/default-icon.png";
 	private static final String PARENT_ICON_URL = "/parent-folder-icon.png";
-	
+
 	private Layout layout;
 	private ObservableList<IconPositioner<? extends Icon>> icons = FXCollections.observableArrayList();
 	private ObservableMap<Positioner, Button> buttons = FXCollections.observableHashMap();
 	private String iconsFolderURI;
-	private ObjectProperty<Button> buttonSelected = new SimpleObjectProperty<>();
-	private Consumer<ScriptableIcon> onScriptTriggered = null;
+	private Consumer<IconPositioner<ScriptableIcon>> onScriptTriggered = null;
+	private ObjectProperty<Layout> loadedLayout = new SimpleObjectProperty<>();
 
 	public LayoutView() {
 		this(new Layout(), new String());
@@ -99,10 +99,6 @@ public class LayoutView extends GridPane {
 
 	}
 
-	public ObjectProperty<Button> onButtonSelectedProperty() {
-		return buttonSelected;
-	}
-
 	/**
 	 * this method should not be used to modify Layout instead use
 	 * {@linkplain LayoutView#getIcons()} for auto update
@@ -152,6 +148,7 @@ public class LayoutView extends GridPane {
 		return button;
 	}
 
+	@SuppressWarnings("unchecked")
 	protected void loadLayout(Layout layout) {
 		for (IconPositioner<? extends Icon> positioner : layout.getIcons()) {
 			Button button = loadIcon(positioner.getIcon(), positioner.getPositioner().getColumnIndex(),
@@ -163,11 +160,9 @@ public class LayoutView extends GridPane {
 					this.loadFolderLayout(layout, icon.getFolderLayout());
 				});
 			} else if (positioner.getIcon().getIconType().equals(IconType.ScriptableIcon)) {
-				ScriptableIcon icon = (ScriptableIcon) positioner.getIcon();
 				button.setOnAction(event -> {
-					this.buttonSelected.set(button);
 					if (this.onScriptTriggered != null)
-						this.onScriptTriggered.accept(icon);
+						this.onScriptTriggered.accept((IconPositioner<ScriptableIcon>) positioner);
 				});
 			}
 
@@ -183,6 +178,7 @@ public class LayoutView extends GridPane {
 				button.setGraphic(new ImageView(DEFAULT_ICON_URL));
 			}
 		}
+		this.loadedLayout.setValue(layout);
 	}
 
 	protected void loadFolderLayout(Layout parentLayout, Layout folderLayout) {
@@ -213,12 +209,16 @@ public class LayoutView extends GridPane {
 		this.iconsFolderURI = iconsFolderURI;
 	}
 
-	public void setOnScriptTriggered(Consumer<ScriptableIcon> onScriptTriggered) {
+	public void setOnScriptTriggered(Consumer<IconPositioner<ScriptableIcon>> onScriptTriggered) {
 		this.onScriptTriggered = onScriptTriggered;
 	}
 
-	public Consumer<ScriptableIcon> getOnScriptTriggered() {
+	public Consumer<IconPositioner<ScriptableIcon>> getOnScriptTriggered() {
 		return onScriptTriggered;
+	}
+	
+	public ObjectProperty<Layout> onLayoutLoadedProperty() {
+		return loadedLayout;
 	}
 
 }

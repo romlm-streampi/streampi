@@ -34,9 +34,8 @@ public class StreampiClient extends Application {
 
 		view = new LayoutView();
 		view.setOnScriptTriggered(icon -> {
-			System.out.println("icon clicked : " + icon.getIconName());
 			try {
-				client.sendScriptInfo(icon.getScriptInfo());
+				client.sendScriptInfo(icon.getIcon().getScriptInfo());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

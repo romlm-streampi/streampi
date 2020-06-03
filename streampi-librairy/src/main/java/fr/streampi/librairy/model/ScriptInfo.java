@@ -55,7 +55,7 @@ public class ScriptInfo implements Serializable {
 
 	@Override
 	public String toString() {
-		return "ScriptInfo [id=" + id + ", type=" + type.name() + "]";
+		return "ScriptInfo [id=" + id + ", type=" + type.toString() + "]";
 	}
 
 	@Override
