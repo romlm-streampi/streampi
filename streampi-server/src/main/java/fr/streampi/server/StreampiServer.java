@@ -1,8 +1,11 @@
 package fr.streampi.server;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 import fr.streampi.server.controler.StreampiServerViewControler;
+import fr.streampi.server.io.DataServer;
+import fr.streampi.server.io.utils.DataUtils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -13,25 +16,31 @@ import javafx.stage.Stage;
 public class StreampiServer extends Application {
 
 	private Stage mainStage;
+	private DataServer server = new DataServer();
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		
+		this.server.bind(InetAddress.getByName(DataUtils.getServerAddress()), DataUtils.getServerPort(), DataUtils.getServerDataPort());
+
 		this.mainStage = primaryStage;
 		primaryStage.setTitle("streampi-server");
 		primaryStage.getIcons().add(new Image("/streampi-icon.png"));
 		StreampiServerViewControler controler = loadMainFrame();
+
+		controler.setServer(server);
 
 		this.mainStage.show();
 
 		this.mainStage.setOnCloseRequest(ev -> {
 			this.mainStage.hide();
 			try {
+				server.close();
+				DataUtils.saveProperties(DataUtils.getProperties());
 				controler.close();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-
 		});
 
 	}

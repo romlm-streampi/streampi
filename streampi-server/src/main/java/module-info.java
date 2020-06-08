@@ -4,7 +4,6 @@ module fr.streampi.server {
 	requires transitive javafx.graphics;
 
 	requires transitive fr.streampi.librairy;
-	requires fr.streampi.plugin;
 
 	opens fr.streampi.server.controler to javafx.fxml;
 
